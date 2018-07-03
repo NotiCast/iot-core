@@ -1,0 +1,10 @@
+[Unit]
+Description=NotiCast - AWS based TTS notification system
+
+[Service]
+ExecStart=/usr/bin/python3 -m noticast
+ExecStartPost=/bin/sleep 5
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
