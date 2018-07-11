@@ -7,16 +7,16 @@ import logging
 import requests
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 
-VENDOR_DIR = "/home/pi/vendor/conf"
+VENDOR_DIR = "/home/pi/.config/noticast"
 
 with open("/etc/machine-id") as machine_file:
     CLIENT_ID = machine_file.read().strip()
-with open("%s/iot-endpoint" % VENDOR_DIR) as endpoint:
+with open("%s/connection/iot-endpoint" % VENDOR_DIR) as endpoint:
     HOSTNAME = endpoint.read().strip()
 
 CA_CHAIN = "%s/chain.pem" % VENDOR_DIR
-PRIVATE_KEY = "%s/key" % VENDOR_DIR
-CERTIFICATE = "%s/cert.crt" % VENDOR_DIR
+PRIVATE_KEY = "%s/connection/key" % VENDOR_DIR
+CERTIFICATE = "%s/connection/cert.crt" % VENDOR_DIR
 
 # Init AWSIoTMQTTClient
 client = AWSIoTMQTTClient(CLIENT_ID)
