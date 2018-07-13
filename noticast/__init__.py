@@ -4,8 +4,12 @@ import time
 
 import logging
 
+import raven
 import requests
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+
+ravenclient = raven.Client('https://3cb64c355d7f4c5790b0ade37a86405f:ceb81b7b1'
+                           '0704f178e69b6b701588434@sentry.io/1243070')
 
 VENDOR_DIR = "/home/pi/.config/noticast"
 
@@ -35,9 +39,13 @@ def handler(_0, _1, message):
     payload = json.loads(message.payload.decode('ascii'))
     uri = payload["uri"]
     with open("/tmp/file.mp3", "wb") as f:
-        for chunk in requests.get(uri, stream=True).iter_content(
-                chunk_size=128):
-            f.write(chunk)
+        try:
+            for chunk in requests.get(uri, stream=True).iter_content(
+                    chunk_size=128):
+                f.write(chunk)
+        except:  # noqa
+            print("Got exception")
+            ravenclient.captureException()
     subprocess.call(["/usr/bin/ffplay", "/tmp/file.mp3",
                      "-nodisp", "-autoexit"])
     print(repr(payload))
