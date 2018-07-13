@@ -5,4 +5,4 @@ setup(
     name='noticast-iot-core',
     version='0.1-dev',
     packages=['noticast'],
-    install_requires=['AWSIoTPythonSDK', 'requests'])
+    install_requires=['AWSIoTPythonSDK', 'requests', 'raven'])
