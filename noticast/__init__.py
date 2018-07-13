@@ -48,10 +48,12 @@ def handler(_0, _1, message):
             ravenclient.captureException()
     subprocess.call(["/usr/bin/ffplay", "/tmp/file.mp3",
                      "-nodisp", "-autoexit"])
+    print()
     print(repr(payload))
 
 
 client.connect()
+print("Connected")
 client.subscribe("noticast-messages", 1, handler)
 
 # wtf AWSIoTPythonSDK, threads?
