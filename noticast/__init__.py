@@ -1,8 +1,7 @@
 import subprocess
 import json
 import time
-
-import logging
+import sys
 
 import raven
 import requests
@@ -31,8 +30,8 @@ client.configureCredentials(CA_CHAIN, PRIVATE_KEY, CERTIFICATE)
 client.configureAutoReconnectBackoffTime(1, 32, 20)
 client.configureOfflinePublishQueueing(-1)  # Infinite offline Publish queueing
 client.configureDrainingFrequency(2)  # Draining: 2 Hz
-client.configureConnectDisconnectTimeout(100)  # 10 sec
-client.configureMQTTOperationTimeout(50)  # 5 sec
+client.configureConnectDisconnectTimeout(10)  # 10 seconds
+client.configureMQTTOperationTimeout(5)  # 5 sec
 
 
 def handler(_0, _1, message):
@@ -40,12 +39,18 @@ def handler(_0, _1, message):
     uri = payload["uri"]
     with open("/tmp/file.mp3", "wb") as f:
         try:
-            for chunk in requests.get(uri, stream=True).iter_content(
-                    chunk_size=128):
+            ravenclient.context.activate()
+            ravenclient.context.merge({
+                "message": payload["message"]
+            })
+            for chunk in requests.get(
+                    uri, stream=True, timeout=5).iter_content(chunk_size=128):
                 f.write(chunk)
         except:  # noqa
             print("Got exception")
             ravenclient.captureException()
+        finally:
+            ravenclient.context.clear()
     subprocess.call(["/usr/bin/ffplay", "/tmp/file.mp3",
                      "-nodisp", "-autoexit"])
     print()
@@ -56,6 +61,6 @@ client.connect()
 print("Connected")
 client.subscribe("noticast-messages", 1, handler)
 
-# wtf AWSIoTPythonSDK, threads?
+
 while True:
     time.sleep(1)
