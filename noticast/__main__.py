@@ -1,7 +1,6 @@
 import subprocess
 import json
 import time
-import sys
 
 import raven
 import requests
@@ -16,6 +15,8 @@ with open("/etc/machine-id") as machine_file:
     CLIENT_ID = machine_file.read().strip()
 with open("%s/connection/iot-endpoint" % VENDOR_DIR) as endpoint:
     HOSTNAME = endpoint.read().strip()
+with open("%s/connection/device-arn" % VENDOR_DIR) as arn:
+    DEVICE_ARN = arn.read().strip()
 
 CA_CHAIN = "%s/chain.pem" % VENDOR_DIR
 PRIVATE_KEY = "%s/connection/key" % VENDOR_DIR
@@ -59,7 +60,7 @@ def handler(_0, _1, message):
 
 client.connect()
 print("Connected")
-client.subscribe("noticast-messages", 1, handler)
+client.subscribe(DEVICE_ARN, 1, handler)
 
 
 while True:
