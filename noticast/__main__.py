@@ -9,14 +9,16 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 ravenclient = raven.Client('https://3cb64c355d7f4c5790b0ade37a86405f:ceb81b7b1'
                            '0704f178e69b6b701588434@sentry.io/1243070')
 
+import logging  # noqa
+logging.basicConfig(level="DEBUG")
+
 VENDOR_DIR = "/home/pi/.config/noticast"
 
-with open("/etc/machine-id") as machine_file:
-    CLIENT_ID = machine_file.read().strip()
 with open("%s/connection/iot-endpoint" % VENDOR_DIR) as endpoint:
     HOSTNAME = endpoint.read().strip()
 with open("%s/connection/device-arn" % VENDOR_DIR) as arn:
     DEVICE_ARN = arn.read().strip()
+CLIENT_ID = DEVICE_ARN.split("/")[-1]
 
 CA_CHAIN = "%s/chain.pem" % VENDOR_DIR
 PRIVATE_KEY = "%s/connection/key" % VENDOR_DIR
