@@ -1,5 +1,6 @@
-import subprocess
+import collections
 import json
+import subprocess
 import time
 
 import raven
@@ -36,10 +37,16 @@ client.configureDrainingFrequency(2)  # Draining: 2 Hz
 client.configureConnectDisconnectTimeout(10)  # 10 seconds
 client.configureMQTTOperationTimeout(5)  # 5 sec
 
+message_ids = collections.deque(maxlen=50)
+
 
 def handler(_0, _1, message):
     payload = json.loads(message.payload.decode('ascii'))
     uri = payload["uri"]
+    message_id = payload["message_id"]
+    if message_id in message_ids:
+        return
+    message_ids.append(message_id)
     with open("/tmp/file.mp3", "wb") as f:
         try:
             ravenclient.context.activate()
